@@ -1,76 +1,20 @@
-<doctype HTML>
-
 <html>
-
 <head>
-	<meta charset= "utf-8"  />
-	<title> Lista drag and drop</title>
-	
-<style>
-
-
-.slist {
-  list-style: none;
-  padding: 0;
-  margin: 0;
- width: 30%;
-  
-  
-}
-.slist li {
-  margin: 10px;
-  padding: 15px;
-  border: 1px solid #dfdfdf;
-  background: #f5f5f5;
-}
-
-
-.slist li.hint {
-  border: 1px solid #ffc49a;
-  background: #feffb4;
-}
-.slist li.active {
-  border: 1px solid #ffa5a5;
-  background: #ffe7e7;
-}
-
-
-
-</style>
-
-	<script type ="text/javascript" src="skrypt.js" > </script>
-
-<script>
-
-
-
-	
-</script>
-
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="Zad5.js"></script>
+    <link rel="stylesheet" href="Zad5.css">
 </head>
-<body >
+<body style="margin: 20 px auto;">
+    <br>
 
- <ol id="sortlist" class ="slist">
-    <li  draggable="true" >ELEMENT 1 </li>
-    <li draggable="true" >ELEMENT 2</li>
-    <li draggable="true" >ELEMENT 3</li>
-    <li draggable="true" >ELEMENT 4</li>
- </ol>
- 
- 
-  <canvas id="myCanvas" width=500 height=500 ></canvas>
-<button type="rodzaj" onclick="rectInRandomPosition();">GENERUJ KWADRAT</button>
-
-<script>
-window.addEventListener("DOMContentLoaded", () => {
-  slist(document.getElementById("sortlist"));
-});
-</script>
-
-
-
-
-
+    <br>
+    <label for="ID">ID: </label> <input id="add_id" type="text" placeholder="01" pattern="[0-9]{1-6}"><br><br>
+    <label for="imie">Imie: </label> <input id="add_name" type="text" placeholder="Jan" pattern="[a-zA-Z]{2,64}"><br><br>
+    <label for="nazwisko">Nazwisko: </label> <input id="add_surname" type="text" placeholder="Kowalski" pattern="[a-zA-Z]{2,64}"><br><br>
+    <label for="wiek">Wiek: </label><input id="add_age" type="text" placeholder="21" pattern="[0-9]{1-3}"><br><br>
+    <label for="email">Adres Email: </label> <input id="add_email" type="text" placeholder="email@wp.pl" pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"><br><br>
+   
+    <button onclick="addKontrahent()">Dodaj kontrahenta</button><br><br>
+   
 </body>
 </html>

@@ -1,71 +1,116 @@
+//prefixes of implementation that we want to test
+window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
 
-const canvas  =document.getElementByID("myCanvas");
-const ctx = canvas.getContext("2d");
-	ctx.fillRect(100,12,20,20);
-function rectInRandomPosition()
-{
-	var randX,randy;
-	randX = Math.random()*500;
-	
-	randY = Math.random()*500;
-	
-	ctx.fillRect(randX,randY,20,20);
-	
-	
+//prefixes of window.IDB objects
+window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
+window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange
+
+if (!window.indexedDB) {
+    window.alert("Brak wsparcia IndexedDB na twoja przegladarke.")
+};
+
+const kontrahent = [{id:"01", name:"Jan", surname:"Kowalski", age:"20", email:"example@wp.pl", postal:"22-550"}];
+
+var db;
+var request = window.indexedDB.open("newDatabase", 1);
+
+request.onerror = function (event) {
+    console.log("error: ");
+};
+
+request.onsuccess = function (event) {
+    db = request.result;
+    console.log("success: ", db);
+    loadTable();
+};
+
+request.onupgradeneeded = function (event) {
+    var db = event.target.result;
+    var objectStore = db.createObjectStore("employee", {
+        keyPath: "id"
+    });
+
+    for (var i in kontrahent) {
+        objectStore.add(kontrahent[i]);
+    }
 }
 
+function loadTable() {
+    var employees = "";
+    $('.employee').remove();
 
-function slist (target) {
-
-  target.classList.add("slist");
-  let items = target.getElementsByTagName("li"), current = null;
-
-ctx.fillRect(100,12,20,20);
-  for (let i of items) {
-    i.draggable = true;
-    
-
-    i.ondragstart = (ev) => {
-      current = i;
-      for (let it of items) {
-        if (it != current) { it.classList.add("hint"); }
-      }
-    };
-    
-  
-    i.ondragenter = (ev) => {
-      if (i != current) { i.classList.add("active"); }
-    };
-
-  
-    i.ondragleave = () => {
-      i.classList.remove("active");
-    };
-
-  
-    i.ondragend = () => { for (let it of items) {
-        it.classList.remove("hint");
-        it.classList.remove("active");
-    }};
- 
- 
-    i.ondragover = (evt) => { evt.preventDefault(); };
- 
-
-    i.ondrop = (evt) => {
-      evt.preventDefault();
-      if (i != current) {
-        let currentpos = 0, droppedpos = 0;
-        for (let it=0; it<items.length; it++) {
-          if (current == items[it]) { currentpos = it; }
-          if (i == items[it]) { droppedpos = it; }
-        }
-        if (currentpos < droppedpos) {
-          i.parentNode.insertBefore(current, i.nextSibling);
+    var objectStore = db.transaction("employee").objectStore("employee");
+    objectStore.openCursor().onsuccess = function (event) {
+        var cursor = event.target.result;
+        if (cursor) {
+            employees = employees.concat(
+                '<tr class="employee">' +
+                '<td class="ID">' + cursor.key + '</td>' +
+                '<td class="Imie">' + cursor.value.name + '</td>' +
+                '<td class="Nazwisko">' + cursor.value.surname + '</td>' +
+                '<td class="Wiek">' + cursor.value.age + '</td>' +
+                '<td class="Email">' + cursor.value.email + '</td>' +
+                
+                '</tr>');
+            cursor.continue(); // wait for next event
         } else {
-          i.parentNode.insertBefore(current, i);
+            $('thead').after(employees); // no more events
         }
-      }
     };
-  }
 }
+
+function addKontrahent() {
+	alert("Dodano");
+    var employeeID = $('#add_id').val();
+    var name = $('#add_name').val();
+    var surname = $('#add_surname').val();
+    var age = $('#add_age').val();
+    var email = $('#add_email').val();
+    
+    var request = db.transaction(["employee"], "readwrite")
+        .objectStore("employee")
+        .add({
+            id: employeeID,
+            name: name,
+            surname: surname,
+            age: age,
+            email: email,
+           
+        });
+
+
+    request.onsuccess = function (event) {
+        loadTable();
+        clearButtons();
+    };
+
+    request.onerror = function (event) {
+        alert("error");
+    }
+
+	alert("Dodano:  ",employeeID ,' ' name ,'  ', surname, '   ', age,'   ', email  );
+}
+
+
+
+
+function deleteEmployee() {
+    var employeeID = $('#delete_id').val();
+    var request = db.transaction(["employee"], "readwrite")
+        .objectStore("employee")
+        .delete(employeeID);
+
+    request.onsuccess = function (event) {
+        loadTable();
+        clearButtons();
+    };
+};
+
+function clearButtons() {
+    $('#add_id').val("");
+    $('#add_name').val("");
+    $('#add_surname').val("");
+    $('#add_age').val("");
+    $('#add_email').val("");
+    $('delete_id').val("");
+};
